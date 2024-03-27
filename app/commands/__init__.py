@@ -1,4 +1,4 @@
-'''Command pattern implementation'''
+'''Commands package'''
 from abc import ABC, abstractmethod
 
 class Command(ABC):
@@ -14,7 +14,12 @@ class CommandHandler:
         self.commands[command_name] = command
 
     def execute_command(self, command_name: str):
-        if command_name in self.commands:
+        # Easier to ask for forgiveness than permission (EAFP) - Use when it's going to most likely work
+        try:
             self.commands[command_name].execute()
-        else:
+        except KeyError:
             print(f"No such command: {command_name}")
+
+    def list_commands(self):
+        """Return a list of registered command names."""
+        return list(self.commands.keys())
