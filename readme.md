@@ -5,6 +5,8 @@
 This midterm requires the development of an advanced Python-based calculator application. Designed to underscore the importance of professional software development practices, the application integrates clean, maintainable code, the application of design patterns, comprehensive logging, dynamic configuration via environment variables, sophisticated data handling with Pandas, and a command-line interface (REPL) for real-time user interaction.
 ## Video demonstration - [here](https://www.loom.com/share/f85e026e792f48e9964ba1fc11b6bad9?sid=7c28a873-d0ca-4d83-a3a8-76870b6530a2)
 
+## Pytest --pylint --cov video - [here](https://www.loom.com/share/9447981ac1a247e9a4c369230f6c79b2?sid=c837728a-d579-4f6e-a0df-4c06866d3928)
+
 ## Project Submission
 
 # Setup
