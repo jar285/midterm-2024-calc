@@ -1,7 +1,8 @@
 '''Divide plugin for the calculator application'''
-# app/plugins/divide/__init__.py
 import logging
+import pandas as pd
 from app.commands import Command
+import os
 
 class DivideCommand(Command):
     def execute(self):
@@ -16,6 +17,19 @@ class DivideCommand(Command):
                 result = num1 / num2
                 print(f"The result of dividing {num1} by {num2} is: {result}")
                 logging.info(f"DivideCommand execution successful: {num1} / {num2} = {result}")
+
+                # Define the CSV file path
+                history_file_path = "./data/calculation_history.csv"
+                # Check if the file exists and is not empty to determine if we should write headers
+                file_exists = os.path.exists(history_file_path)
+                write_header = not file_exists or os.stat(history_file_path).st_size == 0
+
+                # Create a DataFrame to log this operation
+                df = pd.DataFrame([[num1, num2, result]], columns=['Operand 1', 'Operand 2', 'Result'])
+                # Append the operation to a CSV file, adding headers only if the file is new or empty
+                df.to_csv(history_file_path, mode="a", header=write_header, index=False)
+                logging.info(f"Division history updated with result: {result}")
+
         except ValueError:
             print("Please enter valid numbers.")
             logging.error("Invalid input for numbers.")
