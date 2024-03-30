@@ -2,6 +2,7 @@
 import logging
 import pandas as pd
 from app.commands import Command
+from app.calculation_history import CalculationHistory
 import os
 
 class MultiplyCommand(Command):
@@ -13,6 +14,11 @@ class MultiplyCommand(Command):
             result = num1 * num2
             print(f"The result of multiplying {num1} by {num2} is: {result}")
             logging.info(f"MultiplyCommand execution successful: {num1} * {num2} = {result}")
+
+             # Get the singleton instance of CalculationHistory
+            history = CalculationHistory.instance()
+            # Use the add_record method to log the operation with correct column values
+            history.add_record('Multiplication', num1, num2, result)
 
             # Define the CSV file path
             history_file_path = "./data/calculation_history.csv"

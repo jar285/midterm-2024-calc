@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from app.commands import Command
 import os
+from app.calculation_history import CalculationHistory
 
 class AddCommand(Command):
     def execute(self):
@@ -13,6 +14,11 @@ class AddCommand(Command):
             result = num1 + num2
             print(f"The sum is: {result}")
             logging.info(f"AddCommand execution successful: {num1} + {num2} = {result}")
+
+            # Get the singleton instance of CalculationHistory
+            history = CalculationHistory.instance()
+            # Use the add_record method to log the operation with correct column values
+            history.add_record('Addition', num1, num2, result)
 
             # Define the CSV file path
             history_file_path = "./data/calculation_history.csv"

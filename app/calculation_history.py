@@ -26,19 +26,30 @@ class CalculationHistory:
                 logging.info(f"Calculation history loaded from file. File path: {self.history_file}")
             except pd.errors.EmptyDataError:
                 logging.warning(f"Calculation history file is empty. File path: {self.history_file}")
-                self.history_df = pd.DataFrame(columns=['Operation', 'Description', 'Result'])
+                self.history_df = pd.DataFrame(columns=['Expression', 'num1', 'num2', 'Result'])
         else:
             logging.info("No existing calculation history found, initializing new history.")
-            self.history_df = pd.DataFrame(columns=['Operation', 'Description', 'Result'])
+            self.history_df = pd.DataFrame(columns=['Expression', 'num1', 'num2', 'Result'])
         return self.history_df
 
-    def add_record(self, operation, description, result):
-        new_record = {'Operation': operation, 'Description': description, 'Result': result}
-        self.history_df = self.history_df.append(new_record, ignore_index=True)
+    def add_record(self, operation, num1, num2, result):
+        # Ensure new_record has the same columns as history_df
+        new_record = pd.DataFrame([{
+            'Expression': operation,
+            'num1': num1,
+            'num2': num2,
+            'Result': result
+        }], columns=self.history_df.columns)
+        
+        # Concatenate new_record to history_df
+        self.history_df = pd.concat([self.history_df, new_record], ignore_index=True)
+
+        # Keep only the last 10 records if there are more than 10
         if len(self.history_df) > 10:
             self.history_df = self.history_df.tail(10)
+
         self.save_history()
-        logging.info(f"Record added: {description} = {result}")
+        logging.info(f"Record added: {operation} with {num1}, {num2} = {result}")
 
     def save_history(self):
         os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
@@ -55,7 +66,7 @@ class CalculationHistory:
             return False
 
     def clear_history(self):
-        self.history_df = pd.DataFrame(columns=['Operation', 'Description', 'Result'])
+        self.history_df = pd.DataFrame(columns=self.history_df.columns)
         self.save_history()
         logging.info("Calculation history cleared.")
 
@@ -70,5 +81,12 @@ class CalculationHistory:
             return False
 
     @classmethod
-    def _reset_instance_for_testing(cls):
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls.__new__(cls)
+        return cls._instance
+
+    @classmethod
+    def reset_instance_for_testing(cls):
+        '''Public method to reset the CalculationHistory singleton for testing.'''
         cls._instance = None
