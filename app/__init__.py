@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 import logging
 import logging.config
 
-
 class App:
    def __init__(self):
        os.makedirs('logs', exist_ok=True)
@@ -65,9 +64,29 @@ class App:
                self.command_handler.register_command(plugin_name, command_instance)
                logging.info(f"Command '{plugin_name}' from plugin '{plugin_name}' registered.")
 
+   def register_history_commands(self):
+    history_plugin_base = 'app.plugins.history'
+    history_commands = ['load', 'save', 'clear', 'delete']  # Add other subcommands as needed
+
+    for command_name in history_commands:
+        try:
+            # Dynamically import the command module from the history subpackage
+            command_module_path = f'{history_plugin_base}.{command_name}'
+            command_module = importlib.import_module(command_module_path)
+
+            # Iterate over items in the module and register command instances
+            for item_name in dir(command_module):
+                item = getattr(command_module, item_name)
+                if isinstance(item, type) and issubclass(item, Command) and item is not Command:
+                    command_instance = item(self.command_handler) if hasattr(item, 'requires_command_handler') else item()
+                    self.command_handler.register_command(f'history.{command_name}', command_instance)
+                    logging.info(f"History command '{command_name}' registered.")
+        except ImportError as e:
+            logging.error(f"Error loading history command {command_name}: {e}")
 
    def start(self):
        self.load_plugins()
+       self.register_history_commands()
        logging.info("Application started. Type 'exit' to exit.")
        try:
            while True:
